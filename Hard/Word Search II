@@ -1,0 +1,34 @@
+class Solution:
+    def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:
+        m = len(board)
+        n = len(board[0])
+        trie = {}
+        result = []
+        for word in words:
+            node = trie
+            for ch in word:
+                if ch not in node:
+                    node[ch]= {}
+                node = node[ch]
+            node['0']=word
+        directions = [(-1,0),(0,-1),(1,0),(0,1)]
+        def dfs(r,c,node):
+            char = board[r][c]
+            if char not in node:
+                return
+            nex = node[char]
+            wmc = nex.pop('0',False)
+            if wmc:
+                result.append(wmc)
+            board[r][c] = '0'
+            for dpr,dpc in directions:
+                nr,nc = r + dpr, c + dpc
+                if 0<=nr<m  and 0<=nc<n and board[nr][nc]!='0':
+                    dfs(nr,nc,nex)
+            board[r][c] = char
+            if not nex:
+                node.pop(char)
+        for i in range(m):
+            for j in range(n):
+                dfs(i,j,trie)
+        return result
